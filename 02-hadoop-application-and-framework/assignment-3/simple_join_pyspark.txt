@@ -1,0 +1,21 @@
+# Load datasets
+fileA = sc.textFile("input/join1FileA.txt")
+fileB = sc.textFile("input/join1FileB.txt")
+
+# Define split functions
+def split_fileA(line):
+    word, count = line.split(',')
+    count = int(count)
+    return (word, count)
+
+def split_fileB(line):
+    key, count_string = line.split(',')
+    date, word = key.split()
+    return (word, date + " " + count_string)
+
+# Apply split mapper function to datasets
+fileA_data = fileA.map(split_fileA)
+fileB_data = fileB.map(split_fileB)
+
+# Perform join
+fileB_joined_fileA = fileB_data.join(fileA_data)
