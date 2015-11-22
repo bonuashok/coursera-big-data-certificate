@@ -1,0 +1,34 @@
+# Load datasets
+show_views_file = sc.textFile("input/data_gennum?.txt")
+show_channel_file = sc.textFile("input/data_genchan?.txt")
+
+# Define mapper and reducer functions
+def split_show_views(line):
+    show, views = line.split(',')
+    return (show, views)
+
+def split_show_channel(line):
+    show, channel = line.split(',')
+    return (show, channel)
+
+def extract_channel_views(line): 
+    channel_views = line[1]
+    channel = channel_views[0]
+    views = channel_views[1]
+    return (channel, int(views))
+
+def sum_total_count(a, b):
+    return a + b
+
+# Apply mapper functions to datasets
+show_views = show_views_file.map(split_show_views)
+show_channel = show_channel_file.map(split_show_channel)
+
+# Join datasets
+joined_dataset = show_channel.join(show_views)
+
+# Extract channel and views
+channel_views = joined_dataset.map(extract_channel_views)
+
+# Sum total view count per channel
+channel_views.reduceByKey(sum_total_count).collect()
